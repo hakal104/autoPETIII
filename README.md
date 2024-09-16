@@ -1,1 +1,1 @@
-# Model for the final submission of the autoPET challenge III 
+Model for the final submission of the autoPET III challenge
