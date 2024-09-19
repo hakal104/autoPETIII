@@ -104,12 +104,10 @@ class Autopet_model:
         )
         print(f"Output written to: {os.path.join(self.output_path, uuid + '.mha')}")
 
+        
     def predict(self):
         """
-        Runs the classifier and then performs inference using a tracer-specific nnUNet-ensemble.
-
-        Returns:
-            tracer (str): The type of tracer classified ("fdg" or "psma").
+        Your algorithm goes here
         """
         print("Tracer classification starting now!")
         
@@ -117,19 +115,24 @@ class Autopet_model:
         tracer = classify_pet(pet_path, self.ckpt_path)
         dataset_nr = 1 if tracer == 'fdg' else 2
 
+        # Run prediction
+        
         print("nnUNet segmentation starting!")
         
-        # Run nnUNet segmentation for FDG or PSMA dataset
-        nnUNet_cmd = (
-            f"nnUNetv2_predict -i {self.nii_path} -o {self.pred_path} "
-            f"-d {dataset_nr} -c 3d_fullres -p nnUNetResEncUNetMPlans"
-        )
         if dataset_nr == 1:
-            nnUNet_cmd += " -tr nnUNetTrainer_1500epochs_fasterdec"
-        
-        cproc = subprocess.run(nnUNet_cmd, shell=True, check=True)
-        
+            cproc = subprocess.run(
+                f"nnUNetv2_predict -i {self.nii_path} -o {self.pred_path} -d {dataset_nr} -c 3d_fullres -tr nnUNetTrainer_1500epochs_fasterdec -p nnUNetResEncUNetMPlans",
+                shell=True,
+                check=True,
+            )
+        else:
+            cproc = subprocess.run(
+                f"nnUNetv2_predict -i {self.nii_path} -o {self.pred_path} -d {dataset_nr} -c 3d_fullres",
+                shell=True,
+                check=True,
+            )        
         print(cproc)
+        
         print("Prediction finished")
 
         return tracer
